@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+from src.utils.finance_utils import compute_returns
 
 class MonteCarloService:
     @staticmethod
     def simulate(prices, weights, simulations=1000):
-        returns = prices.pct_change().dropna()
+        returns = compute_returns(prices)
         mean = returns.mean().values
         cov = returns.cov().values
         days = len(returns)
