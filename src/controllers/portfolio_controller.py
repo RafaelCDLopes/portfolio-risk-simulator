@@ -1,0 +1,39 @@
+import numpy as np
+from src.models.portfolio_models import PortfolioModel
+from src.services.data_loader import DataLoader
+from src.services.simulation_service import MonteCarloService
+from src.views.portfolio_view import PortfolioView
+
+class PortfolioController:
+    def run(self):
+        tickers, start, end, simulations = PortfolioView.input_section()
+        tickers = [t.strip() for t in tickers.split(",")]
+        weights = PortfolioView.weight_section(tickers)
+        run = PortfolioView.run_button()
+
+        if not run:
+            return
+
+        if sum(weights) == 0:
+            return
+
+        weights = np.array(weights) / sum(weights)
+        prices = DataLoader.load_prices(tickers, start, end)
+
+        PortfolioView.show_prices(prices)
+
+        model = PortfolioModel(prices, weights)
+        PortfolioView.show_cumulative_returns(model.cumulative_returns())
+
+        metrics = {
+            "Expected Return": model.expected_return(),
+            "Volatility": model.volatility(),
+            "Sharpe": model.sharpe_ratio(),
+            "Max Drawdown": model.max_drawdown(),
+            "VaR": model.var(),
+            "CVaR": model.cvar()
+        }
+        PortfolioView.show_metrics(metrics)
+
+        sims = MonteCarloService.simulate(prices, weights, simulations)
+        PortfolioView.show_simulation(sims)

@@ -1,78 +1,41 @@
 import streamlit as st
-from datetime import date
-import numpy as np
-from src.data_loader import DataLoader
-from src.statistics import calculate_log_returns, historical_mean, covariance_matrix
-from src.portfolio import portfolio_return, cumulative_return
-from src.risk_metrics import portfolio_volatility, portfolio_sharpe, max_drawdown, var_historical, cvar_historical
-from src.simulation import monte_carlo_simulation
-import pandas as pd
+from src.controllers.portfolio_controller import PortfolioController
 
-st.title("Portfolio Risk Simulator")
+st.set_page_config(
+    page_title="Portfolio Risk Simulator",
+    page_icon="📈",
+    layout="wide"
+)
 
-# Sidebar
-st.sidebar.header("Input Parameters")
-ticker_input = st.sidebar.text_input("Enter tickers (comma separated)", value="AAPL, MSFT, SPY")
-start_date = st.sidebar.date_input("Start Date", date(2018, 1, 1))
-end_date = st.sidebar.date_input("End Date", date(2024, 1, 1))
-weights_input = st.sidebar.text_input("Enter weights (comma separated, sum=1)", value="0.33,0.33,0.34")
-num_simulations = st.sidebar.number_input("Monte Carlo Simulations", value=1000, step=100)
+# ---------- SIDEBAR ----------
+with st.sidebar:
 
-if st.sidebar.button("Run Simulation"):
-   try:
-      # Load prices
-      loader = DataLoader(ticker_input, start_date, end_date)
-      prices = loader.download_data()
+    st.markdown("## 📈 Portfolio Lab")
+    st.caption("Quantitative Risk Tools")
 
-      # Parse weights
-      weights = np.array([float(w.strip()) for w in weights_input.split(",")])
-      if not np.isclose(weights.sum(), 1.0):
-         st.error("Weights must sum to 1.")
-      elif len(weights) != prices.shape[1]:
-         st.error("Number of weights must match number of tickers.")
-      else:
-         # Statistics
-         returns = calculate_log_returns(prices)
-         mean_returns = historical_mean(returns)
-         cov_matrix = covariance_matrix(returns)
+    st.divider()
 
-         # Portfolio
-         port_returns = portfolio_return(returns, weights)
-         port_cum_returns = cumulative_return(port_returns)
+    if st.button("📊 Portfolio Simulator", use_container_width=True):
+        st.session_state.page = "portfolio"
 
-         # Risk metrics
-         vol = portfolio_volatility(port_returns)
-         sharpe = portfolio_sharpe(port_returns)
-         mdd = max_drawdown(port_cum_returns)
-         var = var_historical(port_returns)
-         cvar = cvar_historical(port_returns)
+    if st.button("⚠️ Risk Dashboard", use_container_width=True):
+        st.session_state.page = "risk"
 
-         # Monte Carlo
-         num_days = 252
-         mc = monte_carlo_simulation(weights, mean_returns.values, cov_matrix.values, num_days=num_days, num_simulations=num_simulations)
-         last_date = prices.index[-1]
-         mc_index = pd.date_range(start=last_date + pd.Timedelta(days=1), periods=num_days, freq='B')
+    if st.button("🎲 Monte Carlo Lab", use_container_width=True):
+        st.session_state.page = "montecarlo"
 
-         mc_df = pd.DataFrame(mc.T, index=mc_index)
+    st.divider()
 
-         # Display
-         st.subheader("Price Data")
-         st.dataframe(prices)
+# default page
+if "page" not in st.session_state:
+    st.session_state.page = "portfolio"
 
-         st.subheader("Portfolio Cumulative Returns")
-         st.line_chart(port_cum_returns)
+# ---------- ROUTER ----------
+if st.session_state.page == "portfolio":
+    PortfolioController().run()
 
-         st.subheader("Portfolio Risk Metrics")
-         st.table({
-            "Volatility": [vol],
-            "Sharpe Ratio": [sharpe],
-            "Max Drawdown": [mdd],
-            "VaR (5%)": [var],
-            "CVaR (5%)": [cvar]
-         })
+elif st.session_state.page == "risk":
+    st.title("Risk Dashboard (coming soon)")
 
-         st.subheader("Monte Carlo Simulation")
-         st.line_chart(mc_df)
-
-   except Exception as e:
-      st.error(f"Error: {e}")
+elif st.session_state.page == "montecarlo":
+    st.title("Monte Carlo Lab (coming soon)")
