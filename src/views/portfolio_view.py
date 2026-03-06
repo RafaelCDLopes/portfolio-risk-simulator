@@ -5,6 +5,20 @@ from datetime import date
 import matplotlib.pyplot as plt
 import pandas as pd
 
+AVAILABLE_TICKERS = [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "GOOGL",
+    "AMZN",
+    "SPY",
+    "GLD",
+    "BTC-USD",
+    "PETR4.SA",
+    "VALE3.SA"
+]
+
+DEFAULT_TICKERS = ["SPY", "GLD", "BTC-USD"]
 
 class PortfolioView:
     @staticmethod
@@ -19,10 +33,11 @@ class PortfolioView:
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                tickers = st.text_input(
-                    "Tickers (separados por vírgula)",
-                    "SPY,GLD,BTC-USD",
-                    help="Use os códigos do Yahoo Finance, separados por vírgula."
+                tickers = st.multiselect(
+                    "Select assets for portfolio",
+                    options=AVAILABLE_TICKERS,
+                    default=DEFAULT_TICKERS,
+                    help="Choose assets available in the dataset."
                 )
 
             with col2:

@@ -10,7 +10,7 @@ from src.views.portfolio_view import PortfolioView
 class PortfolioController:
     def run(self):
         tickers, start, end, simulations, frequency = PortfolioView.input_section()
-        tickers = [normalize_ticker(t) for t in tickers.split(",")]
+        tickers = [normalize_ticker(t) for t in tickers]
         weights = PortfolioView.weight_section(tickers)
         run = PortfolioView.run_button()
 
