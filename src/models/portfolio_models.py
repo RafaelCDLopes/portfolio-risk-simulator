@@ -47,3 +47,11 @@ class PortfolioModel:
         port_ret = self.portfolio_returns()
         var = self.var(alpha)
         return port_ret[port_ret <= var].mean()
+    
+    @staticmethod
+    def returns(prices: pd.DataFrame):
+        return prices.pct_change().dropna()
+
+    @staticmethod
+    def correlation_matrix(returns: pd.DataFrame):
+        return returns.corr()

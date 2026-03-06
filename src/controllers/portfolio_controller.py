@@ -23,8 +23,6 @@ class PortfolioController:
         PortfolioView.show_prices(prices)
 
         model = PortfolioModel(prices, weights)
-        PortfolioView.show_cumulative_returns(model.cumulative_returns())
-
         metrics = {
             "Expected Return": model.expected_return(),
             "Volatility": model.volatility(),
@@ -33,7 +31,16 @@ class PortfolioController:
             "VaR": model.var(),
             "CVaR": model.cvar()
         }
-        PortfolioView.show_metrics(metrics)
 
         sims = MonteCarloService.simulate(prices, weights, simulations)
-        PortfolioView.show_simulation(sims)
+
+        returns = PortfolioModel.returns(prices)
+        corr = PortfolioModel.correlation_matrix(returns)
+
+        PortfolioView.show_results(
+            cumulative_series=model.cumulative_returns(),
+            metrics=metrics,
+            sims=sims,
+            corr=corr,
+            portfolio_returns=model.portfolio_returns(),
+        )

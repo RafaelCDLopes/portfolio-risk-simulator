@@ -8,11 +8,11 @@ class MonteCarloService:
         mean = returns.mean().values
         cov = returns.cov().values
         days = len(returns)
-        sims = np.zeros((days, simulations))
 
-        for i in range(simulations):
-            rand_returns = np.random.multivariate_normal(mean, cov, days)
-            port_returns = rand_returns @ weights
-            sims[:, i] = (1 + port_returns).cumprod()
+        # Vectorized Monte Carlo simulation to evitar loops pesados em Python
+        rand_returns = np.random.multivariate_normal(mean, cov, (simulations, days))
+        # rand_returns: (simulations, days, n_assets)
+        port_returns = rand_returns @ weights  # (simulations, days)
+        sims = (1 + port_returns).cumprod(axis=1).T  # (days, simulations)
 
         return pd.DataFrame(sims)
