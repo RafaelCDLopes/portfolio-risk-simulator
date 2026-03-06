@@ -1,0 +1,73 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# =========================
+# Virtual Environments
+# =========================
+.env
+.venv
+venv/
+env/
+ENV/
+
+# Conda
+conda-meta/
+*.conda
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Build / packaging
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# VSCode
+# =========================
+.vscode/*
+!.vscode/settings.json
+
+# =========================
+# Streamlit
+# =========================
+.streamlit/secrets.toml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# Keep folder
+!data/.gitkeep
+
+# =========================
+# Cache
+# =========================
+.cache/
+.pytest_cache/
+.mypy_cache/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
