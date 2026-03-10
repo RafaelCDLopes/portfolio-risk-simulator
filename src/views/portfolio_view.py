@@ -43,8 +43,8 @@ class PortfolioView:
             with col2:
                 frequency = st.selectbox(
                     "Frequência dos dados",
-                    options=["D", "W", "M"],
-                    format_func=lambda x: {"D": "Diário", "W": "Semanal", "M": "Mensal"}[x],
+                    options=["W", "M"],
+                    format_func=lambda x: { "W": "Semanal", "M": "Mensal"}[x],
                     index=0,
                     help="Padroniza o período para comparação justa entre ativos (ex: BTC 24/7 vs ações em dias úteis)."
                 )
@@ -53,7 +53,7 @@ class PortfolioView:
                 simulations = st.number_input(
                     "Número de simulações (Monte Carlo)",
                     min_value=100,
-                    max_value=10000,
+                    max_value=1000,
                     value=1000,
                     step=100,
                     help="Quantidade de trajetórias simuladas do portfólio."
@@ -105,8 +105,8 @@ class PortfolioView:
         return st.button("🚀 Rodar simulação", use_container_width=True)
 
     @staticmethod
-    def show_prices(prices, frequency="D"):
-        freq_label = {"D": "diário", "W": "semanal", "M": "mensal"}.get(frequency, "diário")
+    def show_prices(prices, frequency="W"):
+        freq_label = {"W": "semanal", "M": "mensal"}.get(frequency, "semanal")
         with st.expander("📈 Dados de preços (ajustados)"):
             st.caption(f"Período padronizado para comparação (frequência: {freq_label})")
             st.dataframe(prices)

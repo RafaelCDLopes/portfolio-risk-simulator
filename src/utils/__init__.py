@@ -1,2 +1,0 @@
-"""Utilitários compartilhados do projeto."""
-

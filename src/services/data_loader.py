@@ -1,12 +1,10 @@
 import pandas as pd
 from datetime import datetime, timedelta
-from src.utils.finance_utils import normalize_ticker
 
 class DataLoader:
     DEFAULT_YEARS = 2
 
     DATASETS = {
-        "D": "data/prices_daily.parquet",
         "W": "data/prices_weekly.parquet",
         "M": "data/prices_monthly.parquet",
     }
@@ -30,7 +28,7 @@ class DataLoader:
     @staticmethod
     def _load_dataset(frequency):
         if frequency not in DataLoader.DATASETS:
-            raise ValueError("Frequency must be 'D', 'W', or 'M'")
+            raise ValueError("Frequency must be 'W' or 'M'")
 
         path = DataLoader.DATASETS[frequency]
         data = pd.read_parquet(path)
@@ -44,10 +42,9 @@ class DataLoader:
         return data
 
     @staticmethod
-    def load_prices(tickers, start=None, end=None, frequency="D"):
+    def load_prices(tickers, start=None, end=None, frequency="W"):
         start, end = DataLoader._validate_dates(start, end)
         data = DataLoader._load_dataset(frequency)
-        tickers = [normalize_ticker(t) for t in tickers]
         available = data.columns
         invalid = [t for t in tickers if t not in available]
 

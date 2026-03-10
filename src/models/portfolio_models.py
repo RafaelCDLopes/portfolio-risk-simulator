@@ -1,22 +1,23 @@
 import numpy as np
 import pandas as pd
-from src.utils.finance_utils import compute_returns
 
 class PortfolioModel:
     def __init__(self, prices: pd.DataFrame, weights: np.array):
         self.prices = prices
         self.weights = weights
-
-        self.returns = PortfolioModel.returns(self.prices)
+        self.returns = self.calc_returns()
         self.mean_returns = self.returns.mean()
         self.cov_matrix = self.returns.cov()
+
+    def calc_returns(self): 
+        return np.log(self.prices / self.prices.shift(1)).dropna()
 
     def portfolio_returns(self):
         return self.returns.dot(self.weights)
 
     def cumulative_returns(self):
         port_ret = self.portfolio_returns()
-        return (1 + port_ret).cumprod()
+        return np.exp(port_ret.cumsum())
 
     def volatility(self):
         return np.sqrt(self.weights.T @ self.cov_matrix @ self.weights)
@@ -75,10 +76,15 @@ class PortfolioModel:
 
         return results, opt_weights, opt_metrics
 
-    @staticmethod
-    def returns(prices: pd.DataFrame):
-        return compute_returns(prices)
+    def correlation_matrix(self):
+        returns = pd.DataFrame(self.returns)
+        corr = returns.corr()
+        return corr
 
-    @staticmethod
-    def correlation_matrix(returns: pd.DataFrame):
-        return returns.corr()
+    def simulate_monte_carlo(self, simulations=200):
+        days = len(self.returns)
+        rand_returns = np.random.multivariate_normal(self.mean_returns.values, self.cov_matrix.values, (simulations, days))
+        port_returns = rand_returns @ self.weights  
+        sims = np.exp(port_returns.cumsum(axis=1)).T
+
+        return pd.DataFrame(sims)

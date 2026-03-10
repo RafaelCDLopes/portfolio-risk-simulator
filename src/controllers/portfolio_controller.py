@@ -1,16 +1,12 @@
 import numpy as np
 import streamlit as st
-from src.models.portfolio_models import PortfolioModel
 from src.services.data_loader import DataLoader
-from src.services.simulation_service import MonteCarloService
-from src.utils.finance_utils import normalize_ticker
 from src.views.portfolio_view import PortfolioView
-
+from src.models.portfolio_models import PortfolioModel
 
 class PortfolioController:
     def run(self):
         tickers, start, end, simulations, frequency = PortfolioView.input_section()
-        tickers = [normalize_ticker(t) for t in tickers]
         weights = PortfolioView.weight_section(tickers)
         run = PortfolioView.run_button()
 
@@ -23,7 +19,6 @@ class PortfolioController:
         weights = np.array(weights) / sum(weights)
         prices = DataLoader.load_prices(tickers, start, end, frequency=frequency)
 
-        # Alinha pesos aos tickers que realmente têm dados (alguns podem ter sido ignorados)
         valid_tickers = list(prices.columns)
         weights = np.array([weights[tickers.index(t)] for t in valid_tickers])
         weights = weights / weights.sum()
@@ -49,10 +44,8 @@ class PortfolioController:
 
         frontier_results, opt_weights, opt_metrics = model.efficient_frontier()
 
-        sims = MonteCarloService.simulate(prices, weights, simulations)
-
-        returns = PortfolioModel.returns(prices)
-        corr = PortfolioModel.correlation_matrix(returns)
+        sims = model.simulate_monte_carlo(simulations)
+        corr = model.correlation_matrix()
 
         PortfolioView.show_results(
             cumulative_series=model.cumulative_returns(),
