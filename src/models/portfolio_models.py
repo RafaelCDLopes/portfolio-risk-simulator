@@ -77,11 +77,10 @@ class PortfolioModel:
         return results, opt_weights, opt_metrics
 
     def correlation_matrix(self):
-        returns = pd.DataFrame(self.returns)
-        corr = returns.corr()
+        corr = self.returns.corr()
         return corr
 
-    def simulate_monte_carlo(self, simulations=200):
+    def simulate_monte_carlo(self, simulations=1000):
         days = len(self.returns)
         rand_returns = np.random.multivariate_normal(self.mean_returns.values, self.cov_matrix.values, (simulations, days))
         port_returns = rand_returns @ self.weights  
