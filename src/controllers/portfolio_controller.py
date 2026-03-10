@@ -58,3 +58,4 @@ class PortfolioController:
             tickers=valid_tickers,
             opt_metrics=opt_metrics,
         )
+        
